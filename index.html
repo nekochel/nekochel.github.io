@@ -1,175 +1,214 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>Marketplace</title>
-  <style>
-    body {
-      margin: 0;
-      background: #0d0d0d;
-      color: white;
-      font-family: Arial;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linch_Monte Market</title>
 
-    header {
-      padding: 15px;
-      background: black;
-      text-align: center;
-      font-size: 20px;
-      font-weight: bold;
-    }
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #000;
+  color: #fff;
+}
 
-    .container {
-      padding: 10px;
-    }
+.screen { display: none; padding: 20px; }
+.active { display: block; }
 
-    .form {
-      background: #111;
-      padding: 10px;
-      border-radius: 10px;
-      margin-bottom: 15px;
-    }
+input, select {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 10px;
+  border: none;
+}
 
-    input, select {
-      width: 100%;
-      margin: 5px 0;
-      padding: 8px;
-      border-radius: 5px;
-      border: none;
-    }
+button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  background: #00bfff;
+  color: #fff;
+}
 
-    button {
-      width: 100%;
-      padding: 10px;
-      background: orange;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
+.card {
+  background: #111;
+  padding: 12px;
+  border-radius: 12px;
+  margin: 10px 0;
+}
 
-    .ads {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-    }
+.card img {
+  width: 100%;
+  border-radius: 10px;
+}
 
-    .card {
-      background: #111;
-      padding: 10px;
-      border-radius: 10px;
-    }
+.bottom {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  background: #111;
+}
 
-    .card img {
-      width: 100%;
-      border-radius: 8px;
-    }
-
-    .price {
-      color: orange;
-      font-weight: bold;
-    }
-  </style>
+.bottom button {
+  flex: 1;
+  background: none;
+}
+</style>
 </head>
 
 <body>
 
-<header>🔥 Marketplace</header>
+<!-- Вход -->
+<div id="home" class="screen active">
+  <h2>Добро пожаловать</h2>
 
-<div class="container">
+  <select id="server">
+    <option>Phoenix</option>
+    <option>Tucson</option>
+    <option>Scottdale</option>
+    <option>Chandler</option>
+  </select>
 
-  <!-- ФОРМА -->
-  <div class="form">
-    <input id="title" placeholder="Название">
-    <input id="price" placeholder="Цена">
-    <input id="image" placeholder="Ссылка на картинку">
-    <input id="server" placeholder="Сервер">
-    <input id="nick" placeholder="Ник">
-    <input id="description" placeholder="Описание">
+  <input id="nick" placeholder="Ваш ник">
+  <button onclick="enter()">Войти</button>
+</div>
 
-    <select id="category">
-      <option>Машина</option>
-      <option>Бизнес</option>
-      <option>Скин</option>
-      <option>Аксессуар</option>
-    </select>
+<!-- Объявления -->
+<div id="ads" class="screen">
+  <h2>Объявления</h2>
+  <div id="list"></div>
+</div>
 
-    <button onclick="addAd()">Добавить объявление</button>
-  </div>
+<!-- Добавить -->
+<div id="add" class="screen">
+  <h2>Продать</h2>
 
-  <!-- ОБЪЯВЛЕНИЯ -->
-  <div class="ads" id="ads"></div>
+  <select id="type">
+    <option>Машина</option>
+    <option>Бизнес</option>
+    <option>Скин</option>
+  </select>
 
+  <input id="title" placeholder="Название">
+  <input id="price" placeholder="Цена">
+  <input id="description" placeholder="Описание">
+  <input type="file" id="image">
+
+  <button onclick="addAd()">Опубликовать</button>
+</div>
+
+<!-- Профиль -->
+<div id="profile" class="screen">
+  <h2>Профиль</h2>
+  <p id="info"></p>
+</div>
+
+<!-- Навигация -->
+<div class="bottom">
+  <button onclick="nav('ads')">Объявления</button>
+  <button onclick="nav('add')">Продать</button>
+  <button onclick="nav('profile')">Профиль</button>
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
 const firebaseConfig = {
-  apiKey: "ТВОЙ_API_KEY",
+  apiKey: "AIzaSyCESik4SPSv6dXIxx8jDfMshHFR98wIECk",
   authDomain: "linchmonte.firebaseapp.com",
   projectId: "linchmonte",
+  storageBucket: "linchmonte.firebasestorage.app",
+  messagingSenderId: "818415056441",
+  appId: "1:818415056441:web:8e37a6dd1646368d23bfe8"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
-const adsContainer = document.getElementById("ads");
+let user = {};
 
-// 📥 Загрузка объявлений
+// вход
+window.enter = function() {
+  const nick = document.getElementById("nick").value;
+  const server = document.getElementById("server").value;
+
+  if(!nick) return alert("Введи ник");
+
+  user = { nick, server };
+
+  document.getElementById("info").innerText = nick + " | " + server;
+
+  nav("ads");
+  loadAds();
+}
+
+// навигация
+window.nav = function(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+
+  if(id === "ads") loadAds();
+}
+
+// загрузка объявлений
 async function loadAds() {
-  adsContainer.innerHTML = "";
+  const q = query(collection(db, "ads"));
+  const snapshot = await getDocs(q);
 
-  const querySnapshot = await getDocs(collection(db, "ads"));
+  let html = "";
 
-  querySnapshot.forEach((doc) => {
-    const data = doc.data();
+  snapshot.forEach(doc => {
+    const ad = doc.data();
 
-    adsContainer.innerHTML += `
+    html += `
       <div class="card">
-        <img src="${data.image}">
-        <h3>${data.title}</h3>
-        <p>${data.description}</p>
-        <p class="price">💰 ${data.price}</p>
-        <p>🌍 ${data.server}</p>
-        <p>👤 ${data.nick}</p>
+        <img src="${ad.image || ''}">
+        <h3>${ad.title}</h3>
+        <p>💰 ${ad.price}</p>
+        <p>${ad.description || ''}</p>
+        <p>👤 ${ad.nick} (${ad.server})</p>
       </div>
     `;
   });
+
+  document.getElementById("list").innerHTML = html;
 }
 
-// ➕ Добавление объявления
-window.addAd = async function () {
-  const title = document.getElementById("title").value;
-  const price = document.getElementById("price").value;
-  const image = document.getElementById("image").value;
-  const server = document.getElementById("server").value;
-  const nick = document.getElementById("nick").value;
-  const description = document.getElementById("description").value;
-  const category = document.getElementById("category").value;
+// добавление объявления
+window.addAd = async function() {
+  const file = document.getElementById("image").files[0];
 
-  if (!title || !price) {
-    alert("Заполни поля!");
-    return;
+  let imageUrl = "";
+
+  if(file){
+    const storageRef = ref(storage, "images/" + Date.now() + "_" + file.name);
+    await uploadBytes(storageRef, file);
+    imageUrl = await getDownloadURL(storageRef);
   }
 
   await addDoc(collection(db, "ads"), {
-    title,
-    price,
-    image,
-    server,
-    nick,
-    description,
-    category
+    title: document.getElementById("title").value,
+    price: document.getElementById("price").value,
+    description: document.getElementById("description").value,
+    category: document.getElementById("type").value,
+    image: imageUrl,
+    nick: user.nick,
+    server: user.server,
+    createdAt: new Date()
   });
 
-  alert("Объявление добавлено!");
+  alert("Объявление добавлено");
 
-  loadAds();
-};
-
-// 🚀 запуск
-loadAds();
+  nav("ads");
+}
 
 </script>
 
