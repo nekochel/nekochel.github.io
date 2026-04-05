@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Linch Monte</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: #000;
+    color: white;
+    overflow: hidden;
+}
+
+/* ФОН ЭФФЕКТОВ */
+#effects {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.snow {
+    position: absolute;
+    top: -10px;
+    opacity: 0.3; /* 👈 НЕ МЕШАЕТ */
+    filter: blur(1px);
+    animation: fall linear infinite;
+}
+
+@keyframes fall {
+    to { transform: translateY(100vh); }
+}
+
+/* КОНТЕНТ */
+.page {
+    position: absolute;
+    width: 100%;
+    height: calc(100% - 70px);
+    padding: 20px;
+    box-sizing: border-box;
+    z-index: 2;
+    overflow-y: auto;
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+/* НЕОН */
+.neon {
+    text-shadow: 0 0 10px #0ff, 0 0 20px #00f;
+}
+
+/* КАРТОЧКИ */
+.card {
+    background: rgba(0,255,255,0.05);
+    border: 1px solid rgba(0,255,255,0.2);
+    box-shadow: 0 0 10px rgba(0,255,255,0.1);
+    margin: 15px 0;
+    padding: 15px;
+    border-radius: 15px;
+}
+
+/* НИЖНЕЕ МЕНЮ */
+.navbar {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 70px;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1px solid rgba(0,255,255,0.2);
+    z-index: 3;
+}
+
+.nav-item {
+    text-align: center;
+    font-size: 12px;
+}
+
+.nav-item span {
+    display: block;
+    font-size: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="effects"></div>
+
+<!-- ОБО МНЕ -->
+<div id="about" class="page active">
+<h2 class="neon">👤 Обо мне</h2>
+<div id="aboutData"></div>
+</div>
+
+<!-- РАБОТЫ -->
+<div id="jobs" class="page">
+<h2 class="neon">💼 Работы</h2>
+<div id="jobsList"></div>
+</div>
+
+<!-- ПРОЧЕЕ -->
+<div id="other" class="page">
+<h2 class="neon">📦 Прочее</h2>
+<div class="card">Доп. информация будет тут</div>
+</div>
+
+<!-- СКАЧАТЬ -->
+<div id="download" class="page">
+<h2 class="neon">⬇️ Скачать</h2>
+<div class="card">
+📱 Android — добавь ссылку<br>
+💻 ПК — добавь ссылку
+</div>
+</div>
+
+<!-- МЕНЮ -->
+<div class="navbar">
+<div class="nav-item" onclick="openPage('about')">
+<span>👤</span>Обо мне
+</div>
+
+<div class="nav-item" onclick="openPage('jobs')">
+<span>💼</span>Работы
+</div>
+
+<div class="nav-item" onclick="openPage('other')">
+<span>📦</span>Прочее
+</div>
+
+<div class="nav-item" onclick="openPage('download')">
+<span>⬇️</span>Скачать
+</div>
+</div>
+
+<script>
+let current = "about";
+
+function openPage(id) {
+    document.getElementById(current).classList.remove("active");
+    document.getElementById(id).classList.add("active");
+    current = id;
+}
+
+/* СНЕГ (ФОН) */
+function createSnow() {
+    const el = document.createElement("div");
+    el.classList.add("snow");
+    el.innerText = "❄️";
+
+    el.style.left = Math.random() * 100 + "vw";
+    el.style.fontSize = (8 + Math.random() * 10) + "px";
+    el.style.animationDuration = (6 + Math.random() * 6) + "s";
+
+    document.getElementById("effects").appendChild(el);
+
+    setTimeout(() => el.remove(), 12000);
+}
+
+setInterval(createSnow, 300);
+
+/* ДАННЫЕ */
+fetch("data.json")
+.then(res => res.json())
+.then(data => {
+
+    let jobsHTML = "";
+    data.jobs.forEach(j => {
+        jobsHTML += `
+        <div class="card">
+        ${j.name}<br>
+        💰 ${j.salary}
+        </div>`;
+    });
+    document.getElementById("jobsList").innerHTML = jobsHTML;
+
+    let aboutHTML = `
+    <div class="card">
+    ${data.about.name}<br><br>
+    ${data.about.desc}<br><br>
+    <a href="${data.about.tg}" style="color:cyan;">📩 Связаться</a>
+    </div>`;
+    document.getElementById("aboutData").innerHTML = aboutHTML;
+
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "jobs": [
+    {"name": "Шахта", "salary": "60 млн Sa$/час"},
+    {"name": "Лесопилка", "salary": "80 млн Sa$/час"},
+    {"name": "Дальнобойщик", "salary": "50 млн Sa$/час"}
+  ],
+
+  "about": {
+    "name": "Linch_Monte",
+    "desc": "Начальный разработчик",
+    "tg": "https://t.me/Daeerty"
+  }
+}
