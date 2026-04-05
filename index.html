@@ -5,166 +5,151 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NEKOCHEL PRO</title>
 
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
 <style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:sans-serif;
+body {
+    margin: 0;
+    font-family: Arial;
+    color: white;
+    overflow: hidden;
+
+    /* ВОТ СЮДА ВСТАВЛЕНА КАРТИНКА */
+    background: url("https://i.ibb.co/4pJvW9s/anime.jpg") no-repeat center center/cover;
 }
 
-body{
-  overflow:hidden;
-  color:white;
+/* затемнение */
+body::after {
+    content: "";
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    top: 0;
+    left: 0;
 }
 
-/* ФОН С ТЯН */
-.bg{
-  position:fixed;
-  width:100%;
-  height:100%;
-  background:url('YOUR_IMAGE_URL') center/cover no-repeat;
-  z-index:-3;
+/* контент */
+.container {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    margin-top: 120px;
 }
 
-/* ТЁМНЫЙ ОВЕРЛЕЙ */
-.overlay{
-  position:fixed;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.6);
-  z-index:-2;
+h1 {
+    font-size: 40px;
+    color: #00eaff;
+    text-shadow: 0 0 20px #00eaff;
 }
 
-/* СТЕКЛО */
-.glass{
-  position:fixed;
-  width:100%;
-  height:100%;
-  backdrop-filter: blur(10px);
-  z-index:-1;
+.card {
+    margin: 20px;
+    padding: 20px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
 }
 
-/* ДОЖДЬ (КАПЛИ) */
-.rain{
-  position:fixed;
-  width:100%;
-  height:100%;
-  overflow:hidden;
+.btn {
+    display: inline-block;
+    padding: 15px 40px;
+    border-radius: 30px;
+    background: linear-gradient(45deg,#00eaff,#0077ff);
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    z-index: 20;
 }
 
-.drop{
-  position:absolute;
-  width:2px;
-  height:20px;
-  background:rgba(255,255,255,0.3);
-  animation:fall linear infinite;
+/* эффекты */
+#effects {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
 }
 
-@keyframes fall{
-  to{
-    transform:translateY(100vh);
-  }
+/* капли */
+.drop {
+    position: absolute;
+    width: 2px;
+    height: 60px;
+    background: rgba(255,255,255,0.4);
+    animation: drip linear infinite;
 }
 
-/* ПАР */
-.steam{
-  position:fixed;
-  bottom:0;
-  width:100%;
-  height:200px;
-  pointer-events:none;
+.big-drop {
+    width: 4px;
+    height: 120px;
 }
 
-.smoke{
-  position:absolute;
-  bottom:0;
-  width:100px;
-  height:100px;
-  background:radial-gradient(circle, rgba(255,255,255,0.2), transparent);
-  animation:steam 6s infinite;
+@keyframes drip {
+    0% { transform: translateY(-100px); opacity: 0; }
+    10% { opacity: 1; }
+    100% { transform: translateY(100vh); opacity: 0; }
 }
 
-@keyframes steam{
-  0%{transform:translateY(0) scale(1); opacity:0.5;}
-  100%{transform:translateY(-200px) scale(2); opacity:0;}
+/* пар */
+.smoke {
+    position: absolute;
+    bottom: -100px;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(255,255,255,0.2), transparent);
+    animation: smokeUp 6s linear infinite;
+    filter: blur(20px);
 }
 
-/* КОНТЕНТ */
-.container{
-  position:relative;
-  z-index:10;
-  padding:20px;
-  text-align:center;
-}
-
-h1{
-  margin-top:30px;
-  font-size:32px;
-  color:#00f0ff;
-  text-shadow:0 0 20px #00f0ff;
-}
-
-.card{
-  margin:20px;
-  padding:20px;
-  border-radius:20px;
-  background:rgba(255,255,255,0.05);
-  backdrop-filter:blur(15px);
-  box-shadow:0 0 20px rgba(0,255,255,0.2);
-}
-
-.btn{
-  display:block;
-  margin-top:10px;
-  padding:12px;
-  border-radius:12px;
-  background:linear-gradient(45deg,#00f0ff,#0066ff);
-  color:white;
-  text-decoration:none;
-  font-weight:bold;
+@keyframes smokeUp {
+    0% { transform: translateY(0); opacity: 0.3; }
+    100% { transform: translateY(-600px); opacity: 0; }
 }
 </style>
 </head>
 
 <body>
 
-<div class="bg"></div>
-<div class="overlay"></div>
-<div class="glass"></div>
-
-<!-- ДОЖДЬ -->
-<div class="rain" id="rain"></div>
-
-<!-- ПАР -->
-<div class="steam" id="steam"></div>
+<div id="effects"></div>
 
 <div class="container">
-  <h1>NEKOCHEL PRO</h1>
+    <h1>NEKOCHEL PRO</h1>
 
-  <div class="card">
-    <div>🔥 Лучший дизайн</div>
-    <a href="#" class="btn">Открыть</a>
-  </div>
+    <div class="card">
+        🔥 Лучший дизайн
+        <br><br>
+        <a href="#" class="btn">Открыть</a>
+    </div>
 </div>
 
 <script>
-/* ДОЖДЬ */
-for(let i=0;i<120;i++){
-  let drop=document.createElement('div');
-  drop.className='drop';
-  drop.style.left=Math.random()*100+'%';
-  drop.style.animationDuration=(0.5+Math.random())+'s';
-  document.getElementById('rain').appendChild(drop);
+const tg = window.Telegram.WebApp;
+tg.ready();
+tg.expand();
+
+/* капли */
+for(let i=0;i<80;i++){
+    let drop=document.createElement('div');
+    drop.className='drop';
+
+    if(Math.random()>0.7){
+        drop.classList.add('big-drop');
+    }
+
+    drop.style.left=Math.random()*100+'%';
+    drop.style.animationDuration=(1+Math.random()*2)+'s';
+
+    document.getElementById('effects').appendChild(drop);
 }
 
-/* ПАР */
-for(let i=0;i<10;i++){
-  let smoke=document.createElement('div');
-  smoke.className='smoke';
-  smoke.style.left=Math.random()*100+'%';
-  smoke.style.animationDelay=(Math.random()*5)+'s';
-  document.getElementById('steam').appendChild(smoke);
+/* пар */
+for(let i=0;i<8;i++){
+    let smoke=document.createElement('div');
+    smoke.className='smoke';
+    smoke.style.left=Math.random()*100+'%';
+    smoke.style.animationDuration=(4+Math.random()*4)+'s';
+
+    document.getElementById('effects').appendChild(smoke);
 }
 </script>
 
