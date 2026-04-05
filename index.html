@@ -1,197 +1,171 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Linch Monte</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEKOCHEL PRO</title>
 
 <style>
-body {
-    margin: 0;
-    font-family: Arial;
-    background: #000;
-    color: white;
-    overflow: hidden;
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:sans-serif;
 }
 
-/* ФОН ЭФФЕКТОВ */
-#effects {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 0;
+body{
+  overflow:hidden;
+  color:white;
 }
 
-.snow {
-    position: absolute;
-    top: -10px;
-    opacity: 0.3; /* 👈 НЕ МЕШАЕТ */
-    filter: blur(1px);
-    animation: fall linear infinite;
+/* ФОН С ТЯН */
+.bg{
+  position:fixed;
+  width:100%;
+  height:100%;
+  background:url('YOUR_IMAGE_URL') center/cover no-repeat;
+  z-index:-3;
 }
 
-@keyframes fall {
-    to { transform: translateY(100vh); }
+/* ТЁМНЫЙ ОВЕРЛЕЙ */
+.overlay{
+  position:fixed;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.6);
+  z-index:-2;
+}
+
+/* СТЕКЛО */
+.glass{
+  position:fixed;
+  width:100%;
+  height:100%;
+  backdrop-filter: blur(10px);
+  z-index:-1;
+}
+
+/* ДОЖДЬ (КАПЛИ) */
+.rain{
+  position:fixed;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+}
+
+.drop{
+  position:absolute;
+  width:2px;
+  height:20px;
+  background:rgba(255,255,255,0.3);
+  animation:fall linear infinite;
+}
+
+@keyframes fall{
+  to{
+    transform:translateY(100vh);
+  }
+}
+
+/* ПАР */
+.steam{
+  position:fixed;
+  bottom:0;
+  width:100%;
+  height:200px;
+  pointer-events:none;
+}
+
+.smoke{
+  position:absolute;
+  bottom:0;
+  width:100px;
+  height:100px;
+  background:radial-gradient(circle, rgba(255,255,255,0.2), transparent);
+  animation:steam 6s infinite;
+}
+
+@keyframes steam{
+  0%{transform:translateY(0) scale(1); opacity:0.5;}
+  100%{transform:translateY(-200px) scale(2); opacity:0;}
 }
 
 /* КОНТЕНТ */
-.page {
-    position: absolute;
-    width: 100%;
-    height: calc(100% - 70px);
-    padding: 20px;
-    box-sizing: border-box;
-    z-index: 2;
-    overflow-y: auto;
-    display: none;
+.container{
+  position:relative;
+  z-index:10;
+  padding:20px;
+  text-align:center;
 }
 
-.page.active {
-    display: block;
+h1{
+  margin-top:30px;
+  font-size:32px;
+  color:#00f0ff;
+  text-shadow:0 0 20px #00f0ff;
 }
 
-/* НЕОН */
-.neon {
-    text-shadow: 0 0 10px #0ff, 0 0 20px #00f;
+.card{
+  margin:20px;
+  padding:20px;
+  border-radius:20px;
+  background:rgba(255,255,255,0.05);
+  backdrop-filter:blur(15px);
+  box-shadow:0 0 20px rgba(0,255,255,0.2);
 }
 
-/* КАРТОЧКИ */
-.card {
-    background: rgba(0,255,255,0.05);
-    border: 1px solid rgba(0,255,255,0.2);
-    box-shadow: 0 0 10px rgba(0,255,255,0.1);
-    margin: 15px 0;
-    padding: 15px;
-    border-radius: 15px;
-}
-
-/* НИЖНЕЕ МЕНЮ */
-.navbar {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    height: 70px;
-    background: rgba(0,0,0,0.8);
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    border-top: 1px solid rgba(0,255,255,0.2);
-    z-index: 3;
-}
-
-.nav-item {
-    text-align: center;
-    font-size: 12px;
-}
-
-.nav-item span {
-    display: block;
-    font-size: 20px;
+.btn{
+  display:block;
+  margin-top:10px;
+  padding:12px;
+  border-radius:12px;
+  background:linear-gradient(45deg,#00f0ff,#0066ff);
+  color:white;
+  text-decoration:none;
+  font-weight:bold;
 }
 </style>
 </head>
 
 <body>
 
-<div id="effects"></div>
+<div class="bg"></div>
+<div class="overlay"></div>
+<div class="glass"></div>
 
-<!-- ОБО МНЕ -->
-<div id="about" class="page active">
-<h2 class="neon">👤 Обо мне</h2>
-<div id="aboutData"></div>
-</div>
+<!-- ДОЖДЬ -->
+<div class="rain" id="rain"></div>
 
-<!-- РАБОТЫ -->
-<div id="jobs" class="page">
-<h2 class="neon">💼 Работы</h2>
-<div id="jobsList"></div>
-</div>
+<!-- ПАР -->
+<div class="steam" id="steam"></div>
 
-<!-- ПРОЧЕЕ -->
-<div id="other" class="page">
-<h2 class="neon">📦 Прочее</h2>
-<div class="card">Доп. информация будет тут</div>
-</div>
+<div class="container">
+  <h1>NEKOCHEL PRO</h1>
 
-<!-- СКАЧАТЬ -->
-<div id="download" class="page">
-<h2 class="neon">⬇️ Скачать</h2>
-<div class="card">
-📱 Android — добавь ссылку<br>
-💻 ПК — добавь ссылку
-</div>
-</div>
-
-<!-- МЕНЮ -->
-<div class="navbar">
-<div class="nav-item" onclick="openPage('about')">
-<span>👤</span>Обо мне
-</div>
-
-<div class="nav-item" onclick="openPage('jobs')">
-<span>💼</span>Работы
-</div>
-
-<div class="nav-item" onclick="openPage('other')">
-<span>📦</span>Прочее
-</div>
-
-<div class="nav-item" onclick="openPage('download')">
-<span>⬇️</span>Скачать
-</div>
+  <div class="card">
+    <div>🔥 Лучший дизайн</div>
+    <a href="#" class="btn">Открыть</a>
+  </div>
 </div>
 
 <script>
-let current = "about";
-
-function openPage(id) {
-    document.getElementById(current).classList.remove("active");
-    document.getElementById(id).classList.add("active");
-    current = id;
+/* ДОЖДЬ */
+for(let i=0;i<120;i++){
+  let drop=document.createElement('div');
+  drop.className='drop';
+  drop.style.left=Math.random()*100+'%';
+  drop.style.animationDuration=(0.5+Math.random())+'s';
+  document.getElementById('rain').appendChild(drop);
 }
 
-/* СНЕГ (ФОН) */
-function createSnow() {
-    const el = document.createElement("div");
-    el.classList.add("snow");
-    el.innerText = "❄️";
-
-    el.style.left = Math.random() * 100 + "vw";
-    el.style.fontSize = (8 + Math.random() * 10) + "px";
-    el.style.animationDuration = (6 + Math.random() * 6) + "s";
-
-    document.getElementById("effects").appendChild(el);
-
-    setTimeout(() => el.remove(), 12000);
+/* ПАР */
+for(let i=0;i<10;i++){
+  let smoke=document.createElement('div');
+  smoke.className='smoke';
+  smoke.style.left=Math.random()*100+'%';
+  smoke.style.animationDelay=(Math.random()*5)+'s';
+  document.getElementById('steam').appendChild(smoke);
 }
-
-setInterval(createSnow, 300);
-
-/* ДАННЫЕ */
-fetch("data.json")
-.then(res => res.json())
-.then(data => {
-
-    let jobsHTML = "";
-    data.jobs.forEach(j => {
-        jobsHTML += `
-        <div class="card">
-        ${j.name}<br>
-        💰 ${j.salary}
-        </div>`;
-    });
-    document.getElementById("jobsList").innerHTML = jobsHTML;
-
-    let aboutHTML = `
-    <div class="card">
-    ${data.about.name}<br><br>
-    ${data.about.desc}<br><br>
-    <a href="${data.about.tg}" style="color:cyan;">📩 Связаться</a>
-    </div>`;
-    document.getElementById("aboutData").innerHTML = aboutHTML;
-
-});
 </script>
 
 </body>
