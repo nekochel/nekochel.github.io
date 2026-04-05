@@ -1,223 +1,176 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Linch Monte</title>
+  <meta charset="UTF-8">
+  <title>Marketplace</title>
+  <style>
+    body {
+      margin: 0;
+      background: #0d0d0d;
+      color: white;
+      font-family: Arial;
+    }
 
-<style>
-body {
-  margin: 0;
-  font-family: Arial;
-  background: url('https://i.ibb.co.com/7t2VfQmy/9b381ab8577f5d8b7187c8e3cf1cc37e.jpg') no-repeat center/cover;
-  overflow: hidden;
-  color: white;
-}
+    header {
+      padding: 15px;
+      background: black;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+    }
 
-/* затемнение */
-body::before {
-  content: "";
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.6);
-  z-index: 0;
-}
+    .container {
+      padding: 10px;
+    }
 
-/* СТРАНИЦЫ */
-.pages {
-  display: flex;
-  width: 400%;
-  height: 100vh;
-  transition: transform 0.5s ease;
-  z-index: 2;
-  position: relative;
-}
+    .form {
+      background: #111;
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
 
-.page {
-  width: 100%;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-}
+    input, select {
+      width: 100%;
+      margin: 5px 0;
+      padding: 8px;
+      border-radius: 5px;
+      border: none;
+    }
 
-/* ТЕКСТ */
-h1 {
-  font-size: 30px;
-  margin: 0;
-}
+    button {
+      width: 100%;
+      padding: 10px;
+      background: orange;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
 
-.sub {
-  opacity: 0.7;
-}
+    .ads {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
 
-/* КНОПКИ */
-.menu {
-  position: fixed;
-  bottom: 10px;
-  width: 100%;
-  display: flex;
-  justify-content: space-around;
-  z-index: 5;
-}
+    .card {
+      background: #111;
+      padding: 10px;
+      border-radius: 10px;
+    }
 
-.menu button {
-  backdrop-filter: blur(10px);
-  background: rgba(255,255,255,0.1);
-  border: none;
-  padding: 10px 15px;
-  border-radius: 15px;
-  color: white;
-  font-size: 14px;
-  transition: 0.3s;
-}
+    .card img {
+      width: 100%;
+      border-radius: 8px;
+    }
 
-.menu button:hover {
-  background: rgba(0,150,255,0.4);
-}
-
-/* ДОЖДЬ */
-.drop {
-  position: fixed;
-  top: -20px;
-  width: 2px;
-  height: 12px;
-  background: rgba(255,255,255,0.4);
-  animation: fall linear infinite;
-  z-index: 1;
-}
-
-@keyframes fall {
-  to { transform: translateY(110vh); }
-}
-
-/* ПОТЁКИ */
-.stream {
-  position: fixed;
-  top: -50px;
-  width: 3px;
-  height: 70px;
-  background: rgba(255,255,255,0.2);
-  border-radius: 10px;
-  animation: streamFall linear infinite;
-  z-index: 1;
-}
-
-@keyframes streamFall {
-  to { transform: translateY(120vh); }
-}
-
-/* ПАР */
-.smoke {
-  position: fixed;
-  bottom: 0;
-  width: 80px;
-  height: 80px;
-  background: radial-gradient(circle, rgba(255,255,255,0.15), transparent);
-  border-radius: 50%;
-  animation: smokeUp linear infinite;
-  z-index: 1;
-}
-
-@keyframes smokeUp {
-  to {
-    transform: translateY(-120vh) scale(1.5);
-    opacity: 0;
-  }
-}
-</style>
+    .price {
+      color: orange;
+      font-weight: bold;
+    }
+  </style>
 </head>
 
 <body>
 
-<!-- СТРАНИЦЫ -->
-<div class="pages" id="pages">
+<header>🔥 Marketplace</header>
 
-  <div class="page">
-    <h1>Создатель</h1>
-    <div class="sub">Linch_Monte</div>
+<div class="container">
+
+  <!-- ФОРМА -->
+  <div class="form">
+    <input id="title" placeholder="Название">
+    <input id="price" placeholder="Цена">
+    <input id="image" placeholder="Ссылка на картинку">
+    <input id="server" placeholder="Сервер">
+    <input id="nick" placeholder="Ник">
+    <input id="description" placeholder="Описание">
+
+    <select id="category">
+      <option>Машина</option>
+      <option>Бизнес</option>
+      <option>Скин</option>
+      <option>Аксессуар</option>
+    </select>
+
+    <button onclick="addAd()">Добавить объявление</button>
   </div>
 
-  <div class="page">
-    <h1>Telegram</h1>
-    <div class="sub">@your_username</div>
-  </div>
-
-  <div class="page">
-    <h1>Скачать</h1>
-    <div class="sub">Скоро...</div>
-  </div>
-
-  <div class="page">
-    <h1>Работы</h1>
-    <div class="sub">Скоро...</div>
-  </div>
+  <!-- ОБЪЯВЛЕНИЯ -->
+  <div class="ads" id="ads"></div>
 
 </div>
 
-<!-- МЕНЮ -->
-<div class="menu">
-  <button onclick="go(0)">TG</button>
-  <button onclick="go(1)">Помощь</button>
-  <button onclick="go(2)">Скачать</button>
-  <button onclick="go(3)">Работы</button>
-</div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-<script>
-let index = 0;
-const pages = document.getElementById("pages");
+const firebaseConfig = {
+  apiKey: "ТВОЙ_API_KEY",
+  authDomain: "linchmonte.firebaseapp.com",
+  projectId: "linchmonte",
+};
 
-/* кнопки */
-function go(i){
-  index = i;
-  pages.style.transform = `translateX(-${i*100}%)`;
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const adsContainer = document.getElementById("ads");
+
+// 📥 Загрузка объявлений
+async function loadAds() {
+  adsContainer.innerHTML = "";
+
+  const querySnapshot = await getDocs(collection(db, "ads"));
+
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+
+    adsContainer.innerHTML += `
+      <div class="card">
+        <img src="${data.image}">
+        <h3>${data.title}</h3>
+        <p>${data.description}</p>
+        <p class="price">💰 ${data.price}</p>
+        <p>🌍 ${data.server}</p>
+        <p>👤 ${data.nick}</p>
+      </div>
+    `;
+  });
 }
 
-/* свайп */
-let startX = 0;
+// ➕ Добавление объявления
+window.addAd = async function () {
+  const title = document.getElementById("title").value;
+  const price = document.getElementById("price").value;
+  const image = document.getElementById("image").value;
+  const server = document.getElementById("server").value;
+  const nick = document.getElementById("nick").value;
+  const description = document.getElementById("description").value;
+  const category = document.getElementById("category").value;
 
-document.addEventListener("touchstart", e=>{
-  startX = e.touches[0].clientX;
-});
+  if (!title || !price) {
+    alert("Заполни поля!");
+    return;
+  }
 
-document.addEventListener("touchend", e=>{
-  let endX = e.changedTouches[0].clientX;
-  let diff = startX - endX;
+  await addDoc(collection(db, "ads"), {
+    title,
+    price,
+    image,
+    server,
+    nick,
+    description,
+    category
+  });
 
-  if(diff > 50 && index < 3) index++;
-  if(diff < -50 && index > 0) index--;
+  alert("Объявление добавлено!");
 
-  go(index);
-});
+  loadAds();
+};
 
-/* ДОЖДЬ */
-for(let i=0;i<120;i++){
-  let d=document.createElement('div');
-  d.className='drop';
-  d.style.left=Math.random()*100+'%';
-  d.style.animationDuration=(0.5+Math.random())+'s';
-  document.body.appendChild(d);
-}
+// 🚀 запуск
+loadAds();
 
-/* ПОТЁКИ */
-for(let i=0;i<10;i++){
-  let s=document.createElement('div');
-  s.className='stream';
-  s.style.left=Math.random()*100+'%';
-  s.style.animationDuration=(2+Math.random()*2)+'s';
-  document.body.appendChild(s);
-}
-
-/* ПАР */
-for(let i=0;i<20;i++){
-  let sm=document.createElement('div');
-  sm.className='smoke';
-  sm.style.left=Math.random()*100+'%';
-  sm.style.animationDuration=(4+Math.random()*4)+'s';
-  document.body.appendChild(sm);
-}
 </script>
 
 </body>
